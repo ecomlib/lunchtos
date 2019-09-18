@@ -1,18 +1,35 @@
 import React from 'react'
 import Head from 'next/head'
-import Menu from '../components/Menu'
+import Item from '../components/Item'
 import data from '../menu.json'
+import Order from '../components/Order';
 
 const Home = () => {
-  const items = (
-    data.menu.items.map(item => <Menu item={item}/>)
+  const ids = []
+  data.menu.items.map(item => !item.available ? console.log(item.name) : null)
+  const categories = (
+    data.menu.categories.map(category => (
+      <div key={category.id}>
+        <h2>{category.name}</h2>
+        {
+          data.menu.items.map(item => 
+            {
+              const itemComp = item.category_id === category.id && item.available
+              ? (<Item key={item.id} item={item}/>) 
+              : null
+              return (
+              <div key={item.id} onClick={() => {ids.push(item.id); console.log(ids)}}>
+                {itemComp}
+              </div>
+            )}
+        )}
+      </div>
+    ))
   )
   return (
     <div className='main'>
       <Head>
-        <title>Artos REPL</title>
-        <meta name="description" content="" />
-        <link rel="canonical" href="https://repl-signing.pierreferay-ferrand.now.sh/" />
+        <title>Lunchtos</title>
         <link rel="stylesheet" href="/static/paper.min.css"/>
       </Head>
       <div className='header'>
@@ -20,10 +37,11 @@ const Home = () => {
       </div>
       <div className='hero'>
         <h2>Restaurant : { data.restaurant.name }</h2>
-        <div>
-          {items}
+        <div className='menu'>
+          {categories}
         </div>
       </div>
+      <Order />
       <style global jsx>{`
         .header {
           display: flex;
@@ -44,6 +62,12 @@ const Home = () => {
           justify-content: center;
           flex-direction: column;
           align-items: center;
+        }
+        .menu {
+          display: flex;
+          width: 90%;
+          flex-wrap: wrap;
+          justify-content: space-evenly;
         }
         h2 {
           font-size: 3em;
