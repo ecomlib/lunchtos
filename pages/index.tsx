@@ -1,8 +1,12 @@
 import React from 'react'
 import Head from 'next/head'
 import Menu from '../components/Menu'
+import data from '../menu.json'
 
 const Home = () => {
+  const items = (
+    data.menu.items.map(item => <Menu item={item}/>)
+  )
   return (
     <div className='main'>
       <Head>
@@ -15,8 +19,10 @@ const Home = () => {
         <h4>Lunchtos <span className="badge secondary">0.1</span></h4>
       </div>
       <div className='hero'>
-        <h2>Lunchtos</h2>
-        <Menu />
+        <h2>Restaurant : { data.restaurant.name }</h2>
+        <div>
+          {items}
+        </div>
       </div>
       <style global jsx>{`
         .header {
