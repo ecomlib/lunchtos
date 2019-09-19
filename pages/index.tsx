@@ -1,16 +1,23 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Head from 'next/head'
 import Item from '../components/Item'
 import data from '../menu.json'
 import Order from '../components/Order';
 
 const Home = () => {
-  const ids = []
+  let [order, setOrder] = useState([])
+  const toggleItem = (item) => {
+    if(order.some(i => i.id === item.id)) {
+      setOrder(order.filter(i => i.id !== item.id))
+    } else {
+      setOrder([...order, {id: item.id, name: item.name}])
+    }
+  }
   data.menu.items.map(item => !item.available ? console.log(item.name) : null)
   const categories = (
     data.menu.categories.map(category => (
       <div key={category.id}>
-        <h2>{category.name}</h2>
+        <h3>{category.name}</h3>
         {
           data.menu.items.map(item => 
             {
@@ -18,7 +25,7 @@ const Home = () => {
               ? (<Item key={item.id} item={item}/>) 
               : null
               return (
-              <div key={item.id} onClick={() => {ids.push(item.id); console.log(ids)}}>
+              <div key={item.id} onClick={() => {toggleItem(item)}}>
                 {itemComp}
               </div>
             )}
@@ -41,7 +48,27 @@ const Home = () => {
           {categories}
         </div>
       </div>
-      <Order />
+      {order.length > 0 && <Order order={order} />}
+      {/* modal start */}
+      <input className="modal-state" id="modal-1" type="checkbox" />
+      <div className="modal">
+        <label className="modal-bg" htmlFor="modal-1"></label>
+        <div className="modal-body">
+          <label className="btn-close" htmlFor="modal-1">X</label>
+          <h4 className="modal-title">Finalizing order</h4>
+          <h5 className="modal-subtitle">Please double check your order and pick your name</h5>
+          {order.map(item => <p className="modal-text">{item.name}</p>)}
+          <div className="form-group">
+            <label htmlFor="paperSelects1">Select</label>
+            <select id="paperSelects1">
+              <option value="1">Option 1</option>
+              <option value="2">Option 2</option>
+              <option value="3">Option 3</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      {/* modal end */}
       <style global jsx>{`
         .header {
           display: flex;

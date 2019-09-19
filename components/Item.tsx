@@ -16,7 +16,7 @@ const Item = (props: any) => {
           <h5 className="card-subtitle">{price}</h5>
           <p className="card-text">{description}</p>
         </div>
-        <img className="image-bottom" src={'https:' + image225} alt="Yummy!" />
+        {image && <img className="image-bottom" src={'https:' + image225} alt="Yummy!" />}
       </div>
       <style global jsx>{`
         .card {
