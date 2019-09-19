@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Head from 'next/head'
 import Item from '../components/Item'
 import data from '../menu.json'
+import people from '../people.json'
 import Order from '../components/Order';
 
 const Home = () => {
@@ -59,11 +60,9 @@ const Home = () => {
           <h5 className="modal-subtitle">Please double check your order and pick your name</h5>
           {order.map(item => <p className="modal-text">{item.name}</p>)}
           <div className="form-group">
-            <label htmlFor="paperSelects1">Select</label>
+            <label htmlFor="paperSelects1">Select your name</label>
             <select id="paperSelects1">
-              <option value="1">Option 1</option>
-              <option value="2">Option 2</option>
-              <option value="3">Option 3</option>
+              {people.map(ppl => <option value={ppl}>{ppl}</option>)}
             </select>
           </div>
         </div>
