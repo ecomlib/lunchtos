@@ -4,9 +4,49 @@ import Item from '../components/Item'
 import data from '../menu.json'
 import people from '../people.json'
 import Order from '../components/Order';
+import * as firebase from 'firebase/app'
+import values from 'lodash/values'
+import flatten from 'lodash/flatten'
+import groupBy from 'lodash/groupBy'
+import 'firebase/database'
 
 const Home = () => {
+  const firebaseConfig = {
+    apiKey: "AIzaSyBeM7BksShySGf6rDg2e8AMUILcTUeJvnY",
+    authDomain: "lunchtos.firebaseapp.com",
+    databaseURL: "https://lunchtos.firebaseio.com",
+    projectId: "lunchtos",
+    storageBucket: "lunchtos.appspot.com",
+    messagingSenderId: "127241441040",
+    appId: "1:127241441040:web:cfbdd4af5043b564d91f95"
+  }
+  if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+  }
+  const db = firebase.database().ref('orders')
   let [order, setOrder] = useState([])
+  let [name, setName] = useState()
+  let [complete, setComplete] = useState(false)
+  db.on('value', (snap) => {
+    const raw = values(snap.toJSON())
+    const items = raw.map(request => values(request.order).map(order => ({id: order.id, name: order.name})))
+    const sorted = groupBy(flatten(items), 'name')
+    values(sorted).map(i => console.log(i[0].name, i.length))
+    const numberOfOrders = raw.length
+    console.log('Number of orders: ', numberOfOrders)
+  })
+  const saveOrder = () => {
+    const finalOrder = {
+      name: name,
+      order: order.map(ord => ({id: ord.id, name: ord.name}))
+    }
+    db.push(finalOrder)
+    setComplete(true)
+  }
+  const handleChange = (e) => {
+    const {value} = e.target
+    setName(value)
+  }
   const toggleItem = (item) => {
     if(order.some(i => i.id === item.id)) {
       setOrder(order.filter(i => i.id !== item.id))
@@ -14,15 +54,16 @@ const Home = () => {
       setOrder([...order, {id: item.id, name: item.name}])
     }
   }
-  data.menu.items.map(item => !item.available ? console.log(item.name) : null)
+  // data.menu.items.map(item => !item.available ? console.log(item.name) : null)
   const categories = (
     data.menu.categories.map(category => (
       <div key={category.id}>
         <h3>{category.name}</h3>
+        <p>{category.description}</p>
         {
           data.menu.items.map(item => 
             {
-              const itemComp = item.category_id === category.id && item.available
+              const itemComp = item.category_id === category.id && item.available && item.raw_price < 10
               ? (<Item key={item.id} item={item}/>) 
               : null
               return (
@@ -41,7 +82,7 @@ const Home = () => {
         <link rel="stylesheet" href="/static/paper.min.css"/>
       </Head>
       <div className='header'>
-        <h4>Lunchtos <span className="badge secondary">0.1</span></h4>
+        <h4>Lunchtos <span className="badge secondary">0.2</span></h4>
       </div>
       <div className='hero'>
         <h2>Restaurant : { data.restaurant.name }</h2>
@@ -58,12 +99,14 @@ const Home = () => {
           <label className="btn-close" htmlFor="modal-1">X</label>
           <h4 className="modal-title">Finalizing order</h4>
           <h5 className="modal-subtitle">Please double check your order and pick your name</h5>
-          {order.map(item => <p className="modal-text">{item.name}</p>)}
+          {order.map(item => <p className="modal-text" key={item.id}>{item.name}</p>)}
           <div className="form-group">
             <label htmlFor="paperSelects1">Select your name</label>
-            <select id="paperSelects1">
-              {people.map(ppl => <option value={ppl}>{ppl}</option>)}
+            <select id="paperSelects1" onChange={handleChange}>
+              {people.map(ppl => <option key={ppl} value={ppl}>{ppl}</option>)}
             </select>
+            <button onClick={() => saveOrder()} disabled={complete}>Send order</button>
+            {complete ? <img src="/static/success.gif" /> : null}
           </div>
         </div>
       </div>

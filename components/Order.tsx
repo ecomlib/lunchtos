@@ -1,6 +1,5 @@
 const Order = (props: any) => {
   const { order } = props
-  console.log(order)
   const list = order.map(item =>
     {
       return (

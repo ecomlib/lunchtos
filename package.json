@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@types/styled-jsx": "^2.2.8",
+    "firebase": "^6.6.2",
     "lodash": "^4.17.15",
     "next": "9.0.5",
     "react": "16.9.0",
